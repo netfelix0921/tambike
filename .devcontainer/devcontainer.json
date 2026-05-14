@@ -1,0 +1,21 @@
+{
+  "name": "RideFlow Codespace",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:20",
+  "forwardPorts": [8081, 19000, 19001, 19002, 19006],
+  "portsAttributes": {
+    "8081": {
+      "label": "Expo Web",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "cd apps/mobile && npm install",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "expo.vscode-expo-tools"
+      ]
+    }
+  }
+}
