@@ -1,0 +1,14 @@
+{
+  "name": "rideflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "RideFlow — cycling app for Metro Manila",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "mobile": "npm --workspace apps/mobile run start",
+    "mobile:ios": "npm --workspace apps/mobile run ios",
+    "mobile:android": "npm --workspace apps/mobile run android"
+  }
+}
