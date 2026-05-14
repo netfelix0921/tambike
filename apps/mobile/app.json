@@ -12,6 +12,10 @@
       "resizeMode": "contain",
       "backgroundColor": "#0B0F14"
     },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "ph.rideflow.app",
@@ -52,11 +56,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-    },
-    "extra": {
-      "supabaseUrl": "SUPABASE_URL_FROM_ENV",
-      "supabaseAnonKey": "SUPABASE_ANON_KEY_FROM_ENV",
-      "mapboxAccessToken": "MAPBOX_ACCESS_TOKEN_FROM_ENV"
     }
   }
 }

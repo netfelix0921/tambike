@@ -1,8 +1,8 @@
 import { useMemo, useRef } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Mapbox from '@rnmapbox/maps';
+import { Platform, StyleSheet, View } from 'react-native';
 import { theme } from '@/theme';
 import type { LatLng, RouteGeometry } from '@/types/ride';
+import { MapPlaceholder } from './MapPlaceholder';
 
 export interface RouteMapProps {
   /** Coordinates of the active route as [lng, lat] tuples */
@@ -22,19 +22,31 @@ export interface RouteMapProps {
 }
 
 /**
- * RouteMap — the single map surface used by Planner, Tracker, and Navigation screens.
- * Mapbox token is configured at app boot via `lib/mapbox.ts`.
+ * RouteMap — the single map surface used by Planner, Tracker, and Navigation.
+ *
+ * `@rnmapbox/maps` is required lazily so the web bundle never tries to
+ * resolve the native module. On web, `RouteMap.web.tsx` is picked up
+ * automatically via Metro's platform extensions.
  */
 export function RouteMap({
   route,
   userLocation,
   zoom = 14,
-  styleURL = Mapbox.StyleURL.Dark,
+  styleURL,
   pois,
   showUserPuck = true,
   followUser = false,
 }: RouteMapProps) {
-  const cameraRef = useRef<Mapbox.Camera>(null);
+  // Defensive: if Mapbox can't be loaded, show the placeholder.
+  let Mapbox: any;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    Mapbox = require('@rnmapbox/maps').default;
+  } catch {
+    return <MapPlaceholder message="Map module unavailable" />;
+  }
+
+  const cameraRef = useRef<any>(null);
 
   const routeGeoJson = useMemo(() => {
     if (!route?.coordinates?.length) return null;
@@ -56,7 +68,7 @@ export function RouteMap({
     <View style={styles.container}>
       <Mapbox.MapView
         style={styles.map}
-        styleURL={styleURL}
+        styleURL={styleURL ?? Mapbox.StyleURL.Dark}
         compassEnabled
         scaleBarEnabled={false}
         attributionEnabled={false}
@@ -67,7 +79,7 @@ export function RouteMap({
           centerCoordinate={center}
           zoomLevel={zoom}
           followUserLocation={followUser}
-          followUserMode={Mapbox.UserTrackingMode.FollowWithHeading}
+          followUserMode={Mapbox.UserTrackingMode?.FollowWithHeading}
           animationDuration={400}
         />
 
@@ -114,6 +126,9 @@ export function RouteMap({
     </View>
   );
 }
+
+// Suppress unused-var warning when bundled for web.
+void Platform;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.ink },

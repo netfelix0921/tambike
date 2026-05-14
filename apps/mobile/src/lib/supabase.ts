@@ -1,17 +1,23 @@
 import 'react-native-url-polyfill/auto';
 import { createClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { env } from './env';
+import { env, isDemoMode } from './env';
 
 /**
- * The Supabase client — uses AsyncStorage for session persistence on RN.
- * Auth refresh runs only while the app is in the foreground (default).
+ * Supabase client.
+ *
+ * In demo mode we still construct a client (with a placeholder URL) so that
+ * downstream services don't crash when imported, but no real network calls
+ * are made — the auth bootstrap short-circuits with a stub profile.
  */
-export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey, {
+const url = isDemoMode ? 'https://demo.invalid' : env.supabaseUrl;
+const key = isDemoMode ? 'demo-anon-key' : env.supabaseAnonKey;
+
+export const supabase = createClient(url, key, {
   auth: {
     storage: AsyncStorage,
-    autoRefreshToken: true,
-    persistSession: true,
+    autoRefreshToken: !isDemoMode,
+    persistSession: !isDemoMode,
     detectSessionInUrl: false,
   },
   realtime: {
